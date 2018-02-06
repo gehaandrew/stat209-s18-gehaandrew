@@ -1,0 +1,46 @@
+---
+title: "My first markdown file"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(readr)
+library(ggplot2)
+```
+
+
+## Reading the Data
+
+The dataset presents each student's top six restaurants of choice. The observations include the student's preferred name, the names of the restaurants, the restaurant location, the type of cuisine, the student's favorite dish, the estimated cost per visit, the number of visits per year, and the year and month of the student's last visit.
+
+```{r}
+mine <- read_csv("C:\\Users\\ag7xx\\Desktop\\fav_restaurants.csv")
+```
+
+
+## Plotting the Data
+
+This plot depicts the number of yearly visits to each particular cuisine choice.
+
+```{r}
+ggplot(mine, aes(cuisine, yearly_visits)) +
+  geom_point()
+```
+
+This plot depicts the number of times the total group of students selected each type of cuisine. The cuisine that was chosen with the highest frequency was "American."
+
+```{r}
+ggplot(mine, aes(cuisine)) +
+  geom_bar(aes(fill = cuisine))
+```
+
+This histogram shows the frequency of the estimated meal prices that the total population of the students listed. The majority of the estimated prices fell between around five and seventeen dollars.
+
+```{r}
+ggplot(mine, aes(cost_per_person)) +
+    geom_histogram(aes(fill = cost_per_person))
+```
+
