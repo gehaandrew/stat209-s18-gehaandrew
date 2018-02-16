@@ -1,0 +1,137 @@
+---
+title: "Lab 10: Filtering Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.height = 5)
+knitr::opts_chunk$set(fig.width = 8.5)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+theme_set(theme_minimal())
+```
+
+## Pick a dataset
+
+Today you will again have a choice of three datasets to work with. You can
+choose either to investigate the daily team ELO ratings in the NBA:
+
+```{r}
+nba <- read_csv("https://statsmaths.github.io/stat_data/nba_elo_daily.csv")
+```
+
+Metadata from US senator's tweets:
+
+```{r}
+tweets <- read_csv("https://statsmaths.github.io/stat_data/senator_tweets_meta.csv")
+```
+
+Or swear words given in the movies of Quentin Tarantino:
+
+```{r}
+tarantino <- read_csv("https://statsmaths.github.io/stat_data/tarantino.csv")
+```
+
+Pick a dataset (feel free to delete the others from the Rmd file if you would
+like), and work on the instructions in the next section.
+
+## Instructions
+
+This lab is similar to the last. You'll pick a dataset and then generate an
+analysis of that data using data visualizations. The difference here is that
+instead of a single plot, I would like you to construct 3-4 plots that
+together tell a linear story. Each plot should be separated by a sentence or
+two describing what the viewer should take away from the plot. Try to keep the
+plots similar in some way; perhaps each simply highlights a different subset
+of the data but has the same underlying layers.
+
+Notice that each of the datasets for today are larger than you will probably
+be able to use. You will need to filter the data to a particular team, year,
+subset of curse words. You may further filter the data to highlight an even
+smaller subset of the data within each plot.
+
+## Plots
+
+This plot shows the total number of swear words used in each of the Tarantino Films.
+
+```{r}
+ggplot(tarantino, aes(movie)) +
+  geom_bar(aes(fill = movie)) +
+  annotate("rect", xmin = 5.5, xmax = 7.5, ymin = 0, ymax = 500, fill = "red", alpha = 0.1) +
+  annotate("text", x = 6.5, y = 525, label = "Highest Swear Word Count")
+```
+
+
+```{r}
+tarantino_dogs <- filter(tarantino, movie %in% c("Reservoir Dogs"))
+tarantino_dogs
+```
+
+This bar graph shows the total number of each swear word throughout the film "Reservoir Dogs."
+
+```{r}
+
+ggplot(tarantino_dogs, aes(word)) +
+  geom_bar(aes(fill = word))
+
+```
+
+
+```{r}
+tarantino_pulp <- filter(tarantino, movie %in% c("Pulp Fiction"))
+tarantino_pulp
+
+```
+
+This bar graph depicts the total number of each swear word throughout the film "Pulp Fiction."
+
+```{r}
+ggplot(tarantino_pulp, aes(word)) +
+  geom_bar(aes(fill = word))
+```
+
+```{r}
+tarantino_new <- filter(tarantino, movie %in% c("Reservoir Dogs", "Pulp Fiction"))
+tarantino_new
+```
+
+This graph shows the total number of swear words used in both the films "Pulp Fiction" and "Reservoir Dogs."
+
+```{r}
+ggplot(tarantino_new, aes(movie)) +
+  geom_bar(fill = "firebrick1") +
+  ylab("Swear Word Count")
+```
+
+
+```{r}
+tarantino_mother <- filter(tarantino_new, word %in% c("motherfucker", "motherfuckers"))
+tarantino_mother
+  
+  
+```
+
+This bar graph shows the total number of time that the words "motherfucker" and "motherfuckers" were used in the films "Pulp Fiction" and "Reservoir Dogs."
+
+```{r}
+ggplot(tarantino_mother, aes(movie)) +
+  geom_bar(color = "violet", fill = "cadetblue1") +
+  xlab("Tarantino Movie") +
+  ylab("Motherfucker/s Count")
+                    
+
+```
+
+
+
+## Analysis
+
+In all of the Tarantino films, the highest number of swear words were used in "Pulp Fiction" and "Reservoir Dogs." It is clear that the difference in the total number of swear words used in both movies was not large, therefore I observed how much of the total count was represented by "motherfucker" and "motherfuckers" in the films. The frequency of those two words was much greater in "Pulp Fiction," suggesting that various other swear words were used more often in "Reservoir Dogs" that make up for the lack of "motherfucker" and "motherfuckers" in "Reservoir Dogs" that drew the total swear word count closer to that of "Pulp Fiction."
