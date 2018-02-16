@@ -1,0 +1,99 @@
+league,team,possession_percent,wins,draws,losses,goals_for,goals_against
+EPL,Chelsea,53,30,3,5,85,33
+EPL,Tottenham,56,26,8,4,86,26
+EPL,Manchester City,59,23,9,6,80,39
+EPL,Liverpool,57,22,10,6,78,42
+EPL,Arsenal,55,23,6,9,77,44
+EPL,Manchester United,55,18,15,5,54,29
+EPL,Everton,52,17,10,11,62,44
+EPL,Southampton,53,12,10,16,41,48
+EPL,Bournemouth,51,12,10,16,55,67
+EPL,West Brom,43,12,9,17,43,51
+EPL,West Ham,49,12,9,17,47,64
+EPL,Leicester City,46,12,8,18,48,63
+EPL,Stoke City,48,11,11,16,41,56
+EPL,Crystal Palace,48,12,5,21,50,63
+EPL,Swansea City,49,12,5,21,45,70
+EPL,Burnley F.C.,45,11,7,20,39,55
+EPL,Watford,48,11,7,20,40,68
+EPL,Hull City,48,9,7,22,37,80
+EPL,Middlesbrough,49,5,13,20,27,53
+EPL,Sunderland,45,6,6,26,29,69
+La Liga,Real Madrid,54,29,6,3,106,41
+La Liga,Barcelona,60,28,6,4,116,37
+La Liga,Atletico Madrid,50,23,9,6,70,27
+La Liga,Sevilla,55,21,9,8,69,49
+La Liga,Villarreal,51,19,10,9,56,33
+La Liga,Real Sociedad,54,19,7,12,59,53
+La Liga,Athletico Bilbao,51,19,6,13,53,43
+La Liga,Espanyol,47,15,11,12,49,50
+La Liga,Alaves,47,14,13,11,41,43
+La Liga,Eibar,49,15,9,14,56,51
+La Liga,Malaga,49,12,10,16,49,55
+La Liga,Valencia,50,13,7,18,56,65
+La Liga,Celta Vigo,52,13,6,19,53,69
+La Liga,Las Palmas,56,10,9,19,53,74
+La Liga,Real Betis,49,10,9,19,41,64
+La Liga,Deportivo,49,8,12,18,43,61
+La Liga,Leganes,47,8,11,19,36,55
+La Liga,Sporting Gijon,47,7,10,21,42,72
+La Liga,Osasuna,44,4,10,24,40,94
+La Liga,Granada,47,4,8,26,30,82
+1. Bundesliga,Bayern München,62,25,7,2,89,22
+1. Bundesliga,RB Leipzig,52,20,7,7,66,39
+1. Bundesliga,Dortmund,57,18,10,6,72,40
+1. Bundesliga,Hoffenheim,54,16,14,4,64,37
+1. Bundesliga,1. FC Koln ,47,12,13,9,51,42
+1. Bundesliga,Hertha BSC,49,15,4,15,43,47
+1. Bundesliga,SC Freiburg,48,14,6,14,42,60
+1. Bundesliga,Werder Bremen,48,13,6,15,61,64
+1. Bundesliga,Monchengladbach,53,12,9,13,45,49
+1. Bundesliga,Schalke 04,52,11,10,13,45,40
+1. Bundesliga,Eintracht Frankfurt,51,11,9,14,36,43
+1. Bundesliga,Bayer Leverkusen,53,11,8,15,53,55
+1. Bundesliga,FC Augsburg,46,9,11,14,35,51
+1. Bundesliga,Hamburger SV,48,10,8,16,33,61
+1. Bundesliga,Mainz,48,10,7,17,44,55
+1. Bundesliga,Wolfsburg,51,10,7,17,34,52
+1. Bundesliga,Ingolstadt,48,8,8,18,36,57
+1. Bundesliga,Darmstadt,44,7,4,23,28,63
+Ligue 1,Monaco,51,30,5,3,107,31
+Ligue 1,Paris Saint-Germain,61,27,6,5,83,27
+Ligue 1,OGC Nice,57,22,12,4,63,36
+Ligue 1,Olympique Lyonnais,56,21,4,13,77,48
+Ligue 1,Marseille,54,17,11,10,57,41
+Ligue 1,Bordeaux,48,15,14,9,53,43
+Ligue 1,Nantes,48,14,9,15,40,54
+Ligue 1,Rennes,51,12,14,12,36,42
+Ligue 1,AS Saint-Etienne,49,12,14,12,41,42
+Ligue 1,Guingamp,48,14,8,16,46,53
+Ligue 1,Angers,46,13,7,18,40,49
+Ligue 1,LOSC,51,13,7,18,40,47
+Ligue 1,Toulouse,46,10,14,14,37,41
+Ligue 1,Metz,45,11,10,17,39,72
+Ligue 1,Montpellier,49,10,9,19,48,66
+Ligue 1,Dijon FCO,47,8,13,17,46,58
+Ligue 1,Caen,46,10,7,21,36,65
+Ligue 1,Lorient,50,10,6,22,44,70
+Ligue 1,AS Nancy Lorraine,44,9,8,21,29,52
+Ligue 1,Bastia,45,8,10,20,29,54
+Serie A,Juventus,55,29,4,5,77,27
+Serie A,Roma,55,28,3,7,90,38
+Serie A,Napoli,59,26,8,4,94,39
+Serie A,Atalanta,50,21,9,8,62,41
+Serie A,Lazio,50,21,7,10,74,51
+Serie A,AC Milan,52,18,9,11,57,45
+Serie A,Inter Milan,54,19,5,14,72,49
+Serie A,Fiorentina,55,16,12,10,63,57
+Serie A,Torino,50,13,14,11,71,66
+Serie A,Sassuolo,47,14,7,17,60,61
+Serie A,Sampdoria,51,12,12,14,49,55
+Serie A,Cagliari,44,14,5,19,55,76
+Serie A,Udinese,44,12,9,17,47,56
+Serie A,Chievo,47,12,7,19,43,61
+Serie A,Bologna,47,11,8,19,40,58
+Serie A,Genoa,48,9,9,20,38,64
+Serie A,Crotone,40,9,7,22,34,58
+Serie A,Empoli,49,8,8,22,29,61
+Serie A,Palermo,46,6,8,24,33,77
+Serie A,Pescara,47,2,9,27,35,83
