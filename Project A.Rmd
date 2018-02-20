@@ -1,0 +1,336 @@
+---
+title: "Implications of Possession Percentages in 2016/17 Across Europe's Top 5 Football Leagues"
+author: "Andrew Geha"
+output: html_notebook
+---
+
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(viridis)
+```
+
+# Implications of Possession Percentages in 2016/17 Across Europe's Top 5 Football Leagues
+
+## Overview
+
+For this project, I gathered data from Europe's top 5 football leagues from the 2016/17 season. Those leagues are the the first tiers of professional football in England (the English Premier League), Spain (La Liga), Germany (1. Bundesliga), France (Ligue 1), and Italy (Serie A.) My goal was to observe whether possession statistics were related to other statistics and outcomes in the same way across the 5 leagues in the 2016/17 season. For example, the best teams often dominate possession, win many games, and score many goals withouth conceding very many. I wanted to see if the implications of possession were related on a multi-faceted level across all 5 leagues.
+The data I collected for each team in all 5 leagues were the league to which the team belonged, the team's name, their average possession percentage throughout the season, their number of wins, draws, and losses, and the number of goals they both scored and conceded. I accessed the data through the league tables on Google and through the statistics provided on Squawka.com and WhoScored.com.
+
+## Data dictionary
+
+Here is a data dictionary for the football_statistics dataset:
+
+- **league**: A categorical variable describing the league to which the respective football teams belong to. Possible options are:
+"EPL" (English Premier League)
+"La Liga" (Spanish Professional Football League)
+"1. Bundesliga" (German Professional Football League)
+"Ligue 1" (French Professional Football League)
+"Serie A" (Italian Professional Football League)
+- **team**: A character variable describing the name of the the football team in the respective league in 2016/17.
+- **possession_percent**: A numeric variable describing the average amount of possession for the team across the entire 2016/17 season.
+- **wins**: A numeric variable describing the total number of wins for each team across the 2016/17 season.
+- **draws**: A numeric variable describing the total number of draws for each team across the 2016/17 season.
+- **losses**: A numeric variable describing the total number of losses for each team across the 2016/17 season.
+- **goals_for**: A numeric variable describing the total number of goals scored by the team across the 2016/17 season.
+- **goals_against**: A numeric variable describing the total number of goals conceded by the team across the 2016/17 season.
+
+Which can be read in as follows:
+
+```{r}
+football_statistics <- read_csv("https://raw.githubusercontent.com/URstats/stat209-s18-gehaandrew/master/football_statistics.csv")
+football_statistics
+```
+
+## Exploratory Analysis
+
+The first thing I noted was the frequency of different possession percentages, regardless of league, from all the teams compiled together. As the graph below shows, it appears that many of the teams had between 45 and 50% possession averaged from their matches that season. Only a small number of teams had more than 55% possession, which reflects that typically only the best teams tend to dominate possession in that way.
+
+```{r, echo=FALSE}
+
+ggplot(football_statistics, aes(possession_percent)) +
+  geom_bar()+
+  geom_bar(fill = "darkorchid") +
+  xlab("Possession Percent") +
+  ylab("Teams") +
+  ggtitle("Total Team Possession Statistics Across Top 5 Leagues")
+
+```
+
+
+In observing the number of wins that each team had, paired with their possession percent from the season, it is clear from the graph below that each league has a fair number of teams which had below 50% possession and 15 or fewer wins. The heavy concentration of points in the annotated rectangle in the graph indicates that if a team had less than 50% of possession throughout the season, that usually translated into fewer wins. Also indicated on the graph are the teams in each of the leagues that finished in first place. Bayern Munchen is an outlier, having possessed far more of the ball than the other top teams over the season. It is interesting to note that in this case significantly more possession did not guarantee more wins--Bayern had the fewest wins compared to the other top teams. However, this may be due to the Bundesliga season only comprising of 34 matches, while the rest of the leagues have 38 matches in their seasons. Regardless, the other 4 top teams all averaged to having a majority of possession over their seasons and finished with significantly more wins than did the teams below the 50% mark.
+
+```{r, echo=FALSE}
+
+ggplot(football_statistics, aes(possession_percent, wins)) +
+  geom_point(aes(color = league)) +
+  annotate("rect", xmin = 45, xmax = 50, ymin = 6, ymax = 15.5, fill = "palevioletred1", alpha = 0.1) +
+  annotate("text", x = 53, y = 31, label = "Chelsea", size = 3) +
+  annotate("text", x = 54, y = 28, label = "Real Madrid", size = 3) +
+  annotate("text", x = 61, y = 26, label = "Bayern Munchen", size = 3) +
+  annotate("text", x = 51, y = 29, label = "Monaco", size = 3) +
+  annotate("text", x = 55, y = 30, label = "Juventus", size = 3) +
+  xlab("Posession Percent") +
+  ylab("Wins") +
+  ggtitle("Number of Wins per Team Based on Possession Percent")
+  
+
+
+```
+
+
+A similar pattern is observable in comparing the number of team losses to their average possession percentages. As would be expected from the inference able to be made from the previous graph, in which possession lower than 50% often correlated with a lower number of wins, less than 50% possession also was indicative of a higher number of losses. Just like there was a cluster of teams with a low number of wins under 50% possession, there is a cluster in the graph below of teams with 15 or more losses under 50% possession. This cluster does not include the annotated last-place teams, the majority of which have even less possession than the clustered teams and have more losses as well.
+Beyond the 50% possession mark, the teams become more spread out and mostly lay underneath the 15 losses mark.
+
+
+```{r, echo=FALSE}
+
+ggplot(football_statistics, aes(possession_percent, losses)) +
+  geom_point(aes(color = league)) +
+  annotate("rect", xmin = 46.5, xmax = 50, ymin = 14.5, ymax = 23, fill = "sienna1", alpha = 0.1) +
+  annotate("text", x = 45, y = 27, label = "Sunderland", size = 3) +
+  annotate("text", x = 47, y = 25, label = "Granada", size = 3) +
+  annotate("text", x = 44, y = 24, label = "Darmstadt", size = 3) +
+  annotate("text", x = 45, y = 21, label = "Bastia", size = 3) +
+  annotate("text", x = 47, y = 28, label = "Pescara", size = 3) +
+  xlab("Possession Percent") +
+  ylab("Losses") +
+  ggtitle("Number of Losses per Team Based on Possession Percent")
+
+
+```
+
+In next observing the relationship between possession percent and the number of draws per team, there is less clear of a trend. Most of both the first- and last-place teams clustered together, with lower and higher numbers of draws, respectively. Teams with less than 50% possession had a slightly higher likelihood of finishing their seasons with more draws, but it does not seem that possession percent correlates with higher or lower numbers of draws across the top football leagues.
+
+
+```{r, echo=FALSE}
+ggplot(football_statistics, aes(possession_percent, draws)) +
+  geom_point(aes(color = league)) +
+  annotate("rect", xmin = 44.5, xmax = 47.5, ymin = 8.5, ymax = 10.5, fill = "indianred1", alpha = 0.1) +
+  annotate("rect", xmin = 50.5, xmax = 55.5, ymin = 2.5, ymax = 6.5, fill = "mediumturquoise", alpha = 0.1) +
+  annotate("text", x = 53, y = 3.5, label = "Chelsea", size = 3) +
+  annotate("text", x = 54, y = 6.5, label = "Real Madrid", size = 3) +
+  annotate("text", x = 61, y = 7.5, label = "Bayern Munchen", size = 3) +
+  annotate("text", x = 51, y = 4.5, label = "Monaco", size = 3) +
+  annotate("text", x = 55, y = 4.5, label = "Juventus", size = 3)+
+  annotate("text", x = 45, y = 5.5, label = "Sunderland", size = 3) +
+  annotate("text", x = 47, y = 10.5, label = "Granada", size = 3) +
+  annotate("text", x = 44, y = 3.5, label = "Darmstadt", size = 3) +
+  annotate("text", x = 45, y = 10.5, label = "Bastia", size = 3) +
+  annotate("text", x = 47, y = 9.5, label = "Pescara", size = 3) +
+  xlab("Possession Percent") +
+  ylab("Draws") +
+  ggtitle("Number of Draws per Team Based on Possession Percent")
+```
+
+
+The number of wins, draws, and losses that a team has does not always tell the full story. For example, a team could finish with a high number of wins but may have won the majority of their matches with 1-0 scorelines. I observed if there was any correlation between possession percentages and the number of goals that teams scored and found a tight cluster of teams who had both under 50% possession and under 50 goals scored. Looking at the scatter plot, it is clear to see a trend in which higher possession percent correlates with a higher number of goals scored.
+
+
+
+```{r, echo=FALSE}
+
+ggplot(football_statistics, aes(possession_percent, goals_for)) +
+  geom_point(aes(color = league)) +
+  annotate("rect", xmin = 43, xmax = 50, ymin = 25, ymax = 50, fill = "hotpink", alpha = 0.1) +
+  xlab("Possession Percent") +
+  ylab("Goals For") +
+  ggtitle("The Number of Goals Scored per Team Based on Possession Percent")
+
+```
+
+
+Furthermore, a similar cluster can be seen in the relationship between possession and the number of goals conceded. For a large number of teams across the 5 leagues, possessing less than 50% of the ball throughout the season correlated with a high likelihood of conceding 50 or more goals. For the teams with greater than 50% possession, rarely did they ever concede above 50 goals. Those teams were better able to dictate the run of play in their matches and therefore confronted the opposition goal more than they allowed their own goal to be threatened.
+
+
+```{r, echo=FALSE}
+
+ggplot(football_statistics, aes(possession_percent, goals_against)) +
+  geom_point(aes(color = league)) +
+  annotate("rect", xmin = 44, xmax = 50, ymin = 50, ymax = 70, fill = "lightslateblue", alpha = 0.1) +
+  xlab("Possession Percent") +
+  ylab("Goals Against") +
+  ggtitle("Number of Goals Against per Team Based on Possession Percent")
+
+```
+
+
+
+
+```{r, include=FALSE}
+
+majority_possession <- filter(football_statistics, possession_percent >= 50)
+majority_possession
+
+```
+
+All of the leagues had a similar number of teams that finished their seasons with a majority of possession. Although Ligue 1 had the fewest (8), the other 4 leagues had either 9 or 10 teams with more than 50% possession. So the discrepancy among the leagues was not large. It is worth noting that even though the Bundesliga has 2 fewer teams than the other 4 leagues, their total of teams that finished with a majority of possession was greater than Ligue 1's total, equal to the EPL's total, and only 1 less than La Liga and Serie A. Therefore, although possession-based football is clearly important in all of the leagues, it seems there is an added emphasis on it in the Bundesliga.
+
+
+```{r, echo=FALSE}
+ggplot(majority_possession, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  xlab("League") +
+  ylab("Teams") +
+  ggtitle("Number of Teams with More than 50% Possession")
+```
+
+
+
+```{r, include=FALSE}
+majority_possession_wins <- filter(majority_possession, wins > 14)
+majority_possession_wins
+```
+
+
+Next I averaged the number of wins across all 5 leagues (14) and observed how many teams with at least 50% possession from each league won more than 14 mathces. Again, the Bundesliga's results relative to the other leagues must be taken with a grain of salt because they play 4 fewer matches than the other 4 leagues. Nevertheless, there was more consistency among the outcomes from the EPL, La Liga, and Serie A. Compared to the number of teams in each league that simply had a majority of possession, there is a stark difference between the respective league outcomes when winning above the total wins average is considered. The starkest difference came from Bundesliga and Ligue 1, and even though the EPL, La Liga, and Serie A experienced changes in their outcomes, the changes were similar across those 3 leagues.
+This shows that the tendency of having a relationship between higher possession and more wins is stronger in the EPL, La Liga, and Serie A than in Ligue 1 and the Bundesliga.  
+
+
+```{r, echo=FALSE}
+ggplot(majority_possession_wins, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  ylab("Teams") +
+  xlab("League") +
+  ggtitle("Teams with 15 or More Wins and 50% Possession")
+```
+
+
+```{r, include=FALSE}
+majority_possession_loss <- filter(majority_possession, losses < 14)
+majority_possession_loss
+```
+
+
+```{r, include=FALSE}
+less_possession <- filter(football_statistics, possession_percent < 50)
+less_possession
+```
+
+
+```{r, include=FALSE}
+less_possession_loss <- filter(less_possession, losses >= 14)
+less_possession_loss
+```
+
+
+As can be inferred from the number of teams in each league with a majority of possession being similar, the total amount of teams with less than 50% possession across the leagues is also relatively similar.
+
+```{r, echo=FALSE}
+ggplot(less_possession, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  xlab("League") +
+  ylab("Teams") +
+  ggtitle("Number of Teams with Under 50% Possession")
+```
+
+
+When factoring in whether or not those teams with under 50% possession lost 14 or more matches, only the EPL and Serie A did not experience any changes in the results. The other 3 leagues' totals dropped by 2 teams at most, but the discrepancies among them were not relatively large. However, the EPL and Serie A's outcomes from this filter show that having less than 50% possession is more likely to be correlated with a higher number of losses in those 2 leagues than in the other top leagues. The same teams that possessed less of the ball in the EPL and Serie A also lost either the average or greater than the average number of losses from the 5 leagues.
+
+
+```{r, echo=FALSE}
+ggplot(less_possession_loss, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  ggtitle("Teams with 14 or More Losses and Under 50% Possession") +
+  xlab("League") +
+  ylab("Teams")
+```
+
+
+```{r, include=FALSE}
+majority_possession_draw <- filter(majority_possession, draws < 9)
+majority_possession_draw
+```
+
+
+In regards to drawing less matches than the average number of draws across the 5 leagues, while retaining at least 50% possession, the EPL differed greatly from La Liga, Ligue 1, and Serie A. Only 3 of the English teams who possessed at least 50% of the ball drew less than 9 matches, implying that the other English teams with more possession either draw or win more matches (also keeping in mind the apparent correlation between 15 or more wins and at least 50% possession in the EPL.)
+Recalling the same correlation with La Liga and Serie A, these outcomes show that the teams with a majority of possession in those leagues were more likely to lose matches than to draw matches. La Liga's relationship with more possession and less draws is particularly in stark contrast with the EPL, which has shown a relationship between more possession and both more draws and wins.
+
+
+```{r, echo=FALSE}
+ggplot(majority_possession_draw, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  xlab("League") +
+  ylab("Teams") +
+  ggtitle("Teams with Less than 9 Draws and at Least 50% Possession")
+```
+
+
+```{r, include=FALSE}
+majority_possession_more_draw <- filter(majority_possession, draws >= 9) 
+majority_possession_more_draw
+
+```
+
+
+The table below confirmns that English teams with more than 50% possession have a greater likelihood to draw 9 or more matches than to lose more than the average number of losses across the 5 leagues. Serie A and the Bundesliga have a similar tendency to possess more of the ball as well as to draw 9 or more matches. 
+
+
+
+```{r, echo=FALSE}
+ggplot(majority_possession_more_draw, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  xlab("League") +
+  ylab("Teams") +
+  ggtitle("Teams with 9 or More Draws and At Least 50% Possession")
+```
+
+
+```{r, include=FALSE}
+less_possession <- filter(football_statistics, possession_percent < 50)
+less_possession
+```
+
+
+```{r, include=FALSE}
+less_possession_for <- filter(less_possession, goals_for < 52)
+less_possession_for
+```
+
+
+I averaged the number of goals scored across the 5 leagues (52) and observed whether teams with less possession also tended to score below that mark. Slightly over half the teams in both the EPL and Ligue 1 scored less while having less of the ball as well. Monaco, the first-place team in Ligue 1, only had 51% possession yet managed to score 107 goals in the season, whereas the highest scoring team in their league who had less than 50% possession (Bordeaux) only scored 53 goals. In the EPL, the highest scoring team below 50% (Crystal Palace) only managed 50 goals; Chelsea, the first-place team in the league, scored 85 goals with only 53% of possession.
+
+
+```{r, echo=FALSE}
+ggplot(less_possession_for, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  xlab("League") +
+  ylab("Teams") +
+  ggtitle("Teams with Less than 52 Goals Scored and Under 50% Possession")
+```
+
+
+```{r, include=FALSE}
+less_possession_against <- filter(less_possession, goals_against > 52)
+less_possession_against
+```
+
+
+I observed the relationship between the leagues' teams under 50% possession and the number of goals they conceded, based on the 52-goal average. Even though the sub-50% teams in Ligue 1 did not often score many goals, the graph below shows that their defenses were relatively stable. Out of the 11 sub-50% teams in the league who scored below the average amount of goals scored, only 7 of them conceded more than the average amount of goals allowed. 
+Ten out of the 11 sub-50% teams in the EPL who failed to score 52 goals in the season also conceded more than 52 goals. 
+The other leagues had less teams with porous defenses that were frequent in the EPL and Serie A. 
+
+
+```{r, echo=FALSE}
+ggplot(less_possession_against, aes(league)) +
+  geom_bar(aes(fill = league)) +
+  xlab("League") +
+  ylab("Teams") +
+  ggtitle("Teams with More than 52 Goals Conceded with Under 50% Possession")
+```
+
+
+
+## Conclusion
+
+Although I made note of differences in correlations between possession and wins, losses, draws, goals scored, and goals allowed among teams from the top 5 leagues, in reality the discrepancies only consisted of 4 teams maximum--usually the differences observed comprised of 2-3 teams. This shows that the correlations between possession percentage and the other statistics in question were relatively consistent across all of the leagues. 
+
+With this said, however, a compilation of the teams from all 5 leagues displayed a positive trendline between more possession and both more wins and goals scored; a negative trend was found between more possession and both losses and goals conceded. 
+In regards to the leagues themselves, the EPL, La Liga, and Serie A showed higher likelihoods to win with more than 50% possession; teams with under 50% in the EPL and Serie A were more likely to lose. Furthermore, teams with more than 50% in La Liga were less likely to draw matches; those teams in the EPL were more likely to draw matches than to lose them. 
+
+## References
+
+Statistics were gathered from Google's league tables, from Squawka.com, and from WhoScored.com.
