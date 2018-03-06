@@ -1,0 +1,163 @@
+---
+title: "Old Wounds Still Run Deep: An Observation of Segregation and Inequality in Richmond"
+author: "Andrew Geha"
+output: html_notebook
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(fig.height = 5)
+knitr::opts_chunk$set(fig.width = 8.5)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(ggmap)
+library(viridis)
+library(forcats)
+library(smodels)
+```
+
+
+## Overview
+
+Given the heavily racialized history of Richmond, VA, I thought it would be interesting to observe racial and economic relationships in the city using data from the census tracts. After filtering out Richmond's data from the country's census tracts, I observed variables of race, average household income based on certain quintiles, and specific age percentages of the city's residents. The data consisted of statistics from counties including Richmond City and Henrico, as well as from surrounding counties like Chesterfield County, King William County, and Sussex County.
+Based on the information provided, it is clear that Richmond's neighborhoods are still sharply segregated along racial lines. Furthermore, there are clear income disparities based on race. 
+
+
+```{r, echo=FALSE}
+tracts <- read_csv("https://raw.githubusercontent.com/statsmaths/stat_data/gh-pages/acs_tract_data_2016.csv.gz")
+```
+
+
+```{r, include=FALSE}
+richmond <- filter(tracts, cbsa == "Richmond, VA")
+richmond
+```
+
+
+```{r, include=FALSE}
+white_black <- group_summarize(richmond, race_white, race_black)
+white_black
+```
+
+
+```{r, echo=FALSE}
+
+tracts_rva <- select(richmond, starts_with("race_"))
+richmond$max_race_category <- names(tracts_rva)[apply(tracts_rva, 1, which.max)]
+
+```
+
+## Mapped Racial Demographics
+
+Certain housing policies implemented during and after the time of the Jim Crow laws ensured that even after the Emancipation Proclamation, neighborhoods in Richmond would be segregated along racial lines (Ramsey, 2015). Because of the crippling effects of the institution of slavery on Black Americans, they lacked quality levels of education as well as sufficient economic skills to succeed at the necessary levels of an increasingly-industrial nation. Therefore, the neighborhoods that Black people were segregated into did not possess many opportunities across good education and jobs, contrasted with White neighborhoods in which people had quality educational and economic opportunities.
+
+Although conditions have improved for Black Americans--the richest 20 percent of them saw their net worth raise by 63 percent between 2000 and 2011--it is still interesting to see if neighborhoods have remained segregated (Samuelson, 2014). According to the map of Richmond below, the city and surrounding area remain heavily segregated.
+
+
+```{r, echo=FALSE}
+qmplot(lon, lat, data = richmond, geom = "blank") +
+  geom_point(aes(color = max_race_category), size = 2) +
+  ggtitle("Map of Highest Richmond Racial Demographics")
+```
+
+As the map shows, high concentrations of Richmond residents on the west side of the city are predominantly white (represented by teal dots). On the eastern side of the city, we can see that Black citizens (red dots) are clustered in neighborhoods together. In the southern side of the area, in which there is a noticable concentration of Black residents, some slight groupings of teal dots (representing White residents) can be seen near the relatively big cluster of red dots. However, there is no clear mixture of teal and red dots; neighborhoods appear to be predominantly segregated.
+
+The distinctions between the racial lines of the city are striking, particularly in what is known as the city's West End. This area in Richmond is known to be the wealthier side to the city, and the fact that the West End is clearly dominantly white. This begs questions of the distribution of wealth in the city, which seems at face value to be remarkably unequal. 
+
+
+
+```{r, echo=FALSE}
+
+richmond$income_under_q4 <- richmond$hh_income_q1 + richmond$hh_income_q2 + richmond$hh_income_q3
+
+```
+
+
+```{r, echo=FALSE}
+richmond$race_white_black <- richmond$race_white + richmond$race_black
+```
+
+## Race and Average Household Income
+
+
+Unfortunately, statistics have demonstrated that the wealth inequality gap between white and black people in Richmond is stark. According to Adesanya (2013), who compared Windsor Farms in Richmond's West End to Gilpin in Richmond's Northside, the average household income in the former neighborhood was $185,000, compared to an average of less than $10,000 in Gilpin. According to the scatterplot below, it appears that stark contrasts in household incomes may be more widespread than just that one case. 
+
+The plot depicts the average household incomes through the first 3 income quintiles for the percentage of residents in Richmond who identify as white. The graph is also filtered to depit where black residents lie in comparison to white residents based on household income. A noticable concentration of black residents is at the bottom left of the plot, which highlights households making less than or equal to $100,000. Only around 42 percent of white residents are positioned within the highlighted rectangle, but it is perhaps more striking to note that the majority of black households in Richmond are located on that particular position in the plot. In contrast, a large cluster of White residents--roughly 48 percent--are making above $100,000. A second highlighted rectangle on the graph notes an absence of black households in the portion of the graph that depicts 25 percent of White residents earning above $150,000. Based on the added filter to the graph comparing White households to Black households, we can see that close to 0 percent of Black households are found in that region of the graph. Rather, the majority of Black households are making, on average, much less than $100,000. 
+As Perriello (2017) relatedly reports, White households on average make almost eleven times more than Black households.  
+
+
+```{r, echo=FALSE}
+ggplot(richmond, aes(race_white, income_under_q4)) +
+  geom_point(aes(color = race_black)) +
+  annotate("rect", xmin = -1, xmax = 37.5, ymin = 0, ymax = 100000, fill = "darkorchid1", alpha = 0.1) +
+  annotate("rect", xmin = 75, xmax = 98, ymin = 150000, ymax = 280000, fill = "chartreuse", alpha = 0.1) +
+  scale_colour_viridis(option = "inferno") +
+  annotate("text", x = 20, y = -7, label = "Majority of Black Households in Richmond", size = 3.5) +
+  annotate("text", x = 79, y = 290000, label = "Noticable Absence of Black Households", size = 3.5) +
+  xlab("Percentage of White Residents") +
+  ylab("Avg Household Incomes Under 4th Quintile") +
+  ggtitle("White Richmond Residents with Average Household Income Under 4th Quintile")
+```
+
+
+```{r, echo=FALSE}
+
+richmond$age_18_to_59 <- richmond$age_18_24 + richmond$age_25_59
+
+```
+
+
+## Age, Race, and Average Household Income
+
+Still focusing on households with average incomes through the first 3 economic quintiles, the next visualization portrays how Richmond residents between the ages of 18 and 59, regardless of race. Filtered into the graph, however, is  spectrum that depicts how White Richmond residents fit into the larger population sample of the plot. 
+
+Between 40 and 60 percent of residents within those age restrictions make on average a range of incomes, from many under $100,000 to a tight concentration of residents making between $100,000 and $150,000. I thought it would be interesting to see what percentage of those residents making above $150,000 on average were white, and the highlighted portion of the graph shows that the majority of White Richmond residents make on average above $150,000. A fair number of lightly colored dots (indicating a higher percentage of White residents) make even above $200,000. Toward the bottom of the y-axis, many darker points are scattered. This shows that although around 25 percent of residents between the ages of 18 and 59 make under $100,000, only a small percentage of those residents are white. 
+
+
+```{r, echo=FALSE}
+ggplot(richmond, aes(age_18_to_59, income_under_q4)) +
+  geom_point(aes(color = race_white)) +
+  annotate("rect", xmin = 45, xmax = 60, ymin = 150000, ymax = 275000, fill = "cornflowerblue", alpha = 0.1) +
+  scale_color_viridis(option = "plasma") +
+  annotate("text", x = 53, y = 280000, label = "Majority White Residents", size = 3.5) +
+  xlab("Percentage of Residents Ages 18 through 59") +
+  ylab("Avg Household Incomes Under 4th Quintile") +
+  ggtitle("Richmond Residents Aged 18 through 59 with Average Household Income Under 4th Quintile")
+```
+
+Although this graph does not specify where racial minorities in Richmond are positioned on this graph, the large concentration of white residents toward trending upward along the y-axis is very telling about where much of the wealth is distributed in Richmond--toward the White residents. 
+
+
+```{r, include=FALSE}
+age_18_to_24 <- group_summarize(richmond, age_18_24)
+print(age_18_to_24, n = 7)
+```
+
+```{r, echo=FALSE}
+age_18_to_24$mean_income_under_q4 <- age_18_to_24$hh_income_q1_mean + age_18_to_24$hh_income_q2_mean + age_18_to_24$hh_income_q3_mean 
+```
+
+
+## Conclusion
+
+The visualizations above confirm that Richmond is still very segregated along both neighborhood lines and, drastically, economic lines. Added to living in predominantly white neighborhoods, White Richmond residents are making significantly more on average than Black residents, and the differences in economic outcomes are quite stark.
+
+
+## References
+
+Adesanya, I. (2013, December 20). Richmond Ranks High in Income Inequality. Retrieved from http://mmj.vcu.edu/2013/12/20/how-income-inequality-divides-richmond/
+
+Perriello, T. (2017, February 23). Tackling the Racial Wealth Gap. Retrieved from https://medium.com/tom-for-virginia/tackling-the-racial-wealth-gap-959ff8e0131c
+
+Ramsey, J. (2015, April 23). Public Square Explores Segregation in Richmond. Richmond Times-Dispatch. Retrieved from http://www.richmond.com/public-square/public-square-explores-segregation-in-richmond/article_828d2adb-2178-59b7-ac76-875d37460226.html
+
+Samuelson, R. (2014, August 28). Samuelson: Wealth Inequality: Some Hidden Good News. Richmond Times-Dispatch. Retrieved from http://www.richmond.com/opinion/their-opinion/robert-samuelson/samuelson-wealth-inequality-some-hidden-good-news/article_765611c9-5466-5e66-af44-590772974cb1.html
+
+
+
