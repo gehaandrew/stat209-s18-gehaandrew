@@ -68,7 +68,7 @@ qmplot(lon, lat, data = richmond, geom = "blank") +
 
 As the map shows, high concentrations of Richmond residents on the west side of the city are predominantly white (represented by teal dots). On the eastern side of the city, we can see that Black citizens (red dots) are clustered in neighborhoods together. In the southern side of the area, in which there is a noticable concentration of Black residents, some slight groupings of teal dots (representing White residents) can be seen near the relatively big cluster of red dots. However, there is no clear mixture of teal and red dots; neighborhoods appear to be predominantly segregated.
 
-The distinctions between the racial lines of the city are striking, particularly in what is known as the city's West End. This area in Richmond is known to be the wealthier side to the city, and the fact that the West End is clearly dominantly white. This begs questions of the distribution of wealth in the city, which seems at face value to be remarkably unequal. 
+The distinctions between the racial lines of the city are striking, particularly in what is known as the city's West End. This area in Richmond is known to be the wealthier side to the city, and the fact that the West End is clearly dominantly white begs questions of the distribution of wealth in the city, which seems at face value to be remarkably unequal. 
 
 
 
@@ -88,7 +88,7 @@ richmond$race_white_black <- richmond$race_white + richmond$race_black
 
 Unfortunately, statistics have demonstrated that the wealth inequality gap between white and black people in Richmond is stark. According to Adesanya (2013), who compared Windsor Farms in Richmond's West End to Gilpin in Richmond's Northside, the average household income in the former neighborhood was $185,000, compared to an average of less than $10,000 in Gilpin. According to the scatterplot below, it appears that stark contrasts in household incomes may be more widespread than just that one case. 
 
-The plot depicts the average household incomes through the first 3 income quintiles for the percentage of residents in Richmond who identify as white. The graph is also filtered to depit where black residents lie in comparison to white residents based on household income. A noticable concentration of black residents is at the bottom left of the plot, which highlights households making less than or equal to $100,000. Only around 42 percent of white residents are positioned within the highlighted rectangle, but it is perhaps more striking to note that the majority of black households in Richmond are located on that particular position in the plot. In contrast, a large cluster of White residents--roughly 48 percent--are making above $100,000. A second highlighted rectangle on the graph notes an absence of black households in the portion of the graph that depicts 25 percent of White residents earning above $150,000. Based on the added filter to the graph comparing White households to Black households, we can see that close to 0 percent of Black households are found in that region of the graph. Rather, the majority of Black households are making, on average, much less than $100,000. 
+The plot depicts the average household incomes through the first 3 income quintiles for the percentage of residents in Richmond who identify as white. The graph is also filtered to depict where black residents lie in comparison to white residents based on household income. A noticable concentration of black residents is at the bottom left of the plot, which highlights households making less than or equal to $100,000. Only around 42 percent of white residents are positioned within the highlighted rectangle, but it is perhaps more striking to note that the majority of black households in Richmond are located on that particular position in the plot. In contrast, a large cluster of White residents--roughly 48 percent--are making above $100,000. A second highlighted rectangle on the graph notes an absence of black households in the portion of the graph that depicts 25 percent of White residents earning above $150,000. Based on the added filter to the graph comparing White households to Black households, we can see that close to 0 percent of Black households are found in that region of the graph. Rather, the majority of Black households are making, on average, much less than $100,000. 
 As Perriello (2017) relatedly reports, White households on average make almost eleven times more than Black households.  
 
 
@@ -115,7 +115,7 @@ richmond$age_18_to_59 <- richmond$age_18_24 + richmond$age_25_59
 
 ## Age, Race, and Average Household Income
 
-Still focusing on households with average incomes through the first 3 economic quintiles, the next visualization portrays how Richmond residents between the ages of 18 and 59, regardless of race. Filtered into the graph, however, is  spectrum that depicts how White Richmond residents fit into the larger population sample of the plot. 
+Still focusing on households with average incomes through the first 3 economic quintiles, the next visualization portrays Richmond residents between the ages of 18 and 59, regardless of race. According to the Organisation for Economic Co-operation and Development, the working age population consists of those between the ages of 15 and 64 ("Working Age Population," 2018); so the 18-59 range is relatively close to depicting the average age range of the actual working population. Filtered into the graph is  spectrum that depicts how White Richmond residents fit into the larger working population sample of the plot. This filter was created to compare where average White working citizen's income in Richmond compares to the rest of the average working population.
 
 Between 40 and 60 percent of residents within those age restrictions make on average a range of incomes, from many under $100,000 to a tight concentration of residents making between $100,000 and $150,000. I thought it would be interesting to see what percentage of those residents making above $150,000 on average were white, and the highlighted portion of the graph shows that the majority of White Richmond residents make on average above $150,000. A fair number of lightly colored dots (indicating a higher percentage of White residents) make even above $200,000. Toward the bottom of the y-axis, many darker points are scattered. This shows that although around 25 percent of residents between the ages of 18 and 59 make under $100,000, only a small percentage of those residents are white. 
 
@@ -152,6 +152,8 @@ The visualizations above confirm that Richmond is still very segregated along bo
 ## References
 
 Adesanya, I. (2013, December 20). Richmond Ranks High in Income Inequality. Retrieved from http://mmj.vcu.edu/2013/12/20/how-income-inequality-divides-richmond/
+
+Demography - Working age population - OECD Data. (n.d.). Retrieved March 07, 2018, from https://data.oecd.org/pop/working-age-population.htm
 
 Perriello, T. (2017, February 23). Tackling the Racial Wealth Gap. Retrieved from https://medium.com/tom-for-virginia/tackling-the-racial-wealth-gap-959ff8e0131c
 
