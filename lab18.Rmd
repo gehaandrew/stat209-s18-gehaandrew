@@ -1,0 +1,160 @@
+---
+title: "Lab 18: Inference for the Mean"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.height = 5)
+knitr::opts_chunk$set(fig.width = 8.5)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(forcats)
+library(smodels)
+theme_set(theme_minimal())
+```
+
+## Instructions
+
+Below you will find several empty R code scripts and answer prompts. Your task
+is to fill in the required code snippets and answer the corresponding
+questions.
+
+## Teacher Salary
+
+We will start today by looking at a small dataset containing teacher
+salaries from 2009-2010 for 71 randomly choosen teachers employed by the
+St. Louis Public School in in Michigan.
+
+```{r}
+teachers <- read_csv("https://statsmaths.github.io/stat_data/teachers_pay.csv")
+```
+
+The available variables are
+
+- base: Base annual salary, in dollars
+- degree: Highest educational degree attained: BA (Bachelor's) or MA (Master's)
+- years: Number of years employeed
+
+Using the mean function, what is the average base pay of all teachers
+in the dataset?
+
+```{r}
+
+mean(teachers$base)
+
+```
+
+Fit a model for the mean of the base pay variable using lm_basic. Save
+the model as an object called "model":
+
+```{r}
+
+model <- lm_basic(base ~ 1, data = teachers)
+
+```
+
+Using a call to `reg_table`, find the mean implied by the model:
+
+```{r}
+
+reg_table(model)
+
+```
+
+Does the mean agree with your answer to question 2?
+
+**Answer**: The numbers aren't exactly the same; from question 2 it was 56937.61, and this mean is 56938, but they are close enough to where I would say they do agree.
+
+Add a 95% confidence interval to the regression table.
+
+```{r}
+reg_table(model, level = 0.95)
+```
+
+What is the range of mean salaries implied by the confidence interval?
+
+**Answer**: The range of mean salaries could be fromn 54,785 to 59,091 dollars.
+
+Draw a histogram of the base salary values for the entire dataset.
+
+```{r}
+
+ggplot(teachers, aes(base)) +
+  geom_histogram()
+
+```
+
+Do most of the salary values fall within the range given in question 5? Why
+or why not?
+
+**Answer**: Most of the salary values fall outside of the range specified. The confidence interval is used to guess at the mean, not explain the data as a whole.
+
+Use the filter command to construct a new dataset called `masters` consisting
+of just those teachers with a masters degree.
+
+```{r}
+masters <- filter(teachers, degree == "MA")
+masters
+```
+
+Compute a 95% confidence interval for the mean pay of teachers with a master's
+degree. Does this range intersect the one you had in question 5?
+
+```{r}
+
+mastersmodel <- lm_basic(base ~ 1, data = masters)
+
+reg_table(mastersmodel, level = 0.95)
+
+```
+
+## Murder Data
+
+Now load the following dataset containing all murders that have occurred in
+London from 1 January 2006 to 7 September 7 2011.
+
+```{r}
+london <- read_csv("https://statsmaths.github.io/stat_data/london_murders.csv")
+```
+
+The available variables are:
+
+- age: age of the victim in years
+- year: year of the murder
+- borough: the London borough in which the murder took place
+
+Find an 80% confidence interval for the average age of the victim of a
+murder in London.
+
+```{r}
+
+londonmodel <- lm_basic(age ~ 1, data = london)
+
+reg_table(londonmodel, level = 0.8)
+
+```
+
+Make sure you actually extract the answer here:
+
+**Answer**: The average age of murder victims in London is 33.86, so roughly 34 years old. 
+
+Describe in words how the proceeding confidence interval should be
+interpreted.
+
+**Answer**: The confidence interval suggests that although the best guess of the average age of murder victims in London is 33.86, the mean age could very well fall anywhere between the ages of 33.07 and 34.65.
+
+
+
+
+
+
+
+
