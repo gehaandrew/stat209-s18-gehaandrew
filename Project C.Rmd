@@ -1,0 +1,257 @@
+---
+title: "Relationship Between Weekly Wages and Age in the World's Most Valuable Football Team Leagues"
+author: "Andrew Geha"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(ggmap)
+library(viridis)
+library(forcats)
+library(smodels)
+```
+
+##Introduction
+
+It is no secret that spending in the world's top footballing leagues--such as the English Premier League and Spain's La Liga--has recently skyrocketed. For example, the French team Paris Saint-German F.C. paid a record fee of around 193.5 million British Pounds (222 million Euros) for F.C. Barcelona's Neymar Jr. In 2016, Manchester United paid 91.5 million pounds for Paul Pogba. I observed the weekly wages for the world's top 5 most valuable teams--Real Madrid, Manchester United, Barcelona, Bayern Munich, and Arsenal--to see if players' weekly wages were correlated with age. I hypothesized that 1) age would be positively correlated with weekly wages, particularly in the most valuable English Premier League (EPL) teams, that 2) younger players (ages 18-24) in the La Liga teams make more than young players in the other teams, and that 3) the Bundesliga's Bayern Munich would show the least growth between weekly wages and age. 
+
+Hypothesis 1 is based on the high spending trends of the EPL. Added to the expensive transfer of Paul Pogba, Manchester United also recently paid 75 million pounds and Arsenal paid 55 million pounds for Pierre-Emerick Aubameyang. As the players grow and if the teams will want to keep hold of them with new contracts, their already high fees will only grow higher.
+
+Hypothesis 2 is based on the fact that since 2010, Real Madrid and Barcelona have won a combined 5 UEFA Champions League finals. Knowing this, I would think that those two teams would be most likely to invest in dynamic youth players.
+
+Relative to the other footbal leagues, German football teams tend to spend less on players, which is the logic from which I constructed Hypothesis 3.
+
+I will refer to each team as the league to which they belong, although it is important to note that although I will call Bayern Munich "the Bundesliga" in the following analyses, Bayern is the sole Bundesliga team in the top 5 most valuable team list.
+
+## Data Dictionary
+
+Here is a data dictionary for the wage_age dataset:
+-**weekly_wages**: A numeric variable describing the weekly wages of each player, in British Pounds Sterling. 
+-**league**: A categorical variable describing the league to which the respective player belongs to. Possible options are:
+"La Liga" (Spanish Professional Football League)
+"EPL" (English Premier League)
+"Bundesliga" (German Professional Football League)
+-**age**: The age of each respective player. 
+
+Which can be be read in as:
+
+```{r}
+wage_age <- read.csv("https://raw.githubusercontent.com/URstats/stat209-s18-gehaandrew/master/wage_age.csv")
+wage_age
+```
+
+
+
+
+## Methods
+
+I collected the information for my dataset from the following websites: totalsportek.com, spotrac.com, and tsmsportz.com, as well as through basic Google searches. From the websites, I attained the 2017/18 weekly wages for each of the top 5 most valuable teams in the world. I listed each player's age, the league to which they belong, and their weekly wages in British Pounds-Sterling. Each row in the dataset represents a player from each team, in the order of the teams' rankings in value. 
+
+Before running regression models to test my hypotheses, I plotted each of the league's ages and weekly wages in a boxplot and a violin plot, respectively, to observe how each of those values compared to each other.
+
+To test Hypothesis 1, I used a regression model to test weekly wages as a function of player age. I also then filtered out the players in the EPL teams into a separate dataset to see if any significance I found in the overall sample still held between just Manchester United and Arsenal.
+
+Next, in order to test Hypothesis 2, I filtered out the players aged 24 and under from the overall dataset. I created La Liga as the baseline in the regression model for that hypothesis, where tested weekly wages as a function of each league. La Liga as the baseline allowed me to see if the other 2 leagues in question differed significantly from the Spanish squads. 
+
+In regards to testing Hypothesis 3, I filtered out all the Bundesliga players into a separate dataset to run a model of weekly wages as a function of age specific to that population. I did the same with the players from La Liga and I used the model from testing Hypothesis 2 to compare the linear growth of the EPL teams to those of La Liga and the Bundesliga.
+
+
+##Results
+
+The mean weekly wages across all top 5 most valuable teams is calculated below, at around £98,706.61.
+
+```{r, echo=FALSE}
+mean(wage_age$weekly_wages)
+```
+
+The distribution for weekly wages for each league is shown below, to give an idea of the amount of money being spent by the respective teams on their players. For each league, most of the players are within receiving between £50,000 and around £100,000 a week.  
+
+```{r, echo=FALSE}
+
+ggplot(wage_age, aes(league, weekly_wages)) +
+  geom_violin(fill = "mediumpurple1") +
+  ylab("Weekly Wages") +
+  xlab("League") +
+  ggtitle("Distribution of Weekly Wages")
+
+```
+
+The following model displays weekly wages as a function of age, across all of the top 5 teams.
+
+```{r, echo=FALSE}
+
+model <- lm_basic(weekly_wages ~ 1 + age, data = wage_age)
+
+wage_age <- add_prediction(wage_age, model)
+wage_age
+
+
+reg_table(model, level = 0.95)
+
+
+
+```
+
+The output, which includes predictions for the values, is displayed in the scatterplot below, with a trendline as well.
+
+```{r, echo=FALSE}
+ggplot(wage_age, aes(age, weekly_wages)) +
+  geom_point(color = "violetred1") +
+  geom_line(aes(y = model_pred), color = "slateblue1") +
+  ylab("Weekly Wages") +
+  xlab("Age") +
+  ggtitle("Growth of Weekly Wages in Relation to Player Age in All 5 Teams")
+```
+
+
+
+```{r, include=FALSE}
+epl <- filter(wage_age, league == "EPL")
+epl
+```
+
+In the model below, the dataset using only the EPL players is used to test if the relationship between weekly wages and age still holds for just Manchester United and Arsenal.
+
+```{r, echo=FALSE}
+
+model <- lm_basic(weekly_wages ~ 1 + age, data = epl)
+
+epl <- add_prediction(epl, model)
+epl
+
+reg_table(model, level = 0.95)
+
+```
+
+That relationship is portrayed in the scatterplot below, which also contains a trendline.
+
+```{r, echo=FALSE}
+
+ggplot(epl, aes(age, weekly_wages)) +
+  geom_point(color = "deepskyblue") +
+  geom_line(aes(y = model_pred), color = "palevioletred1") +
+  ylab("Weekly Wages") +
+  xlab("Age") +
+  ggtitle("Growth of Weekly Wages in Relation to Player Age in the EPL")
+
+```
+
+
+
+```{r, include=FALSE}
+age_24_under <- filter(wage_age, age <= 24)
+```
+
+
+In the following regression model, weekly wages are tested as a function of league, using the dataset that includes players aged 24 and under. The output is displayed in a violin plot below, showing the distribution of each league's spending on weekly wages for young players.
+
+```{r, echo=FALSE}
+age_24_under$league <- fct_relevel(age_24_under$league, "La Liga")
+
+model <- lm_basic(weekly_wages ~ 1 + league, data = age_24_under)
+
+reg_table(model, level = 0.95)
+```
+
+
+```{r, echo=FALSE}
+ggplot(age_24_under, aes(league, weekly_wages)) +
+  geom_violin(fill = "cornflowerblue") +
+  ylab("Weekyl Wages") +
+  xlab("League") +
+  ggtitle("Distribution of Wages for Players Ages 24 & Under")
+```
+
+
+
+```{r, include=FALSE}
+bayern <- filter(wage_age, league == "Bundesliga")
+bayern
+```
+
+
+The model below includes weekly wages as a function of age for the Bayern dataset, including predicted values displayed in the scatterplot following the output.
+
+
+```{r, echo=FALSE}
+model <- lm_basic(weekly_wages ~ 1 + age, data = bayern)
+
+bayern <- add_prediction(bayern, model)
+bayern
+
+reg_table(model, level = 0.95)
+```
+
+```{r, echo=FALSE}
+ggplot(bayern, aes(age, weekly_wages)) +
+  geom_point(color = "deeppink") +
+  geom_line(aes(y = model_pred), color = "navyblue") +
+  ylab("Weekly Wages") +
+  xlab("Age") +
+  ggtitle("Growth of Weekly Wages in Relation to Player Age in the Bundesliga")
+```
+
+
+```{r, include=FALSE}
+laliga <- filter(wage_age, league == "La Liga")
+laliga
+```
+
+The same model was run for the dataset including only La Liga players, including a scatterplot with fitted values as well.
+
+```{r, echo=FALSE}
+model <- lm_basic(weekly_wages ~ 1 + age, data = laliga)
+
+laliga <- add_prediction(laliga, model)
+laliga
+
+reg_table(model, level = 0.95)
+```
+
+
+```{r, echo=FALSE}
+
+ggplot(laliga, aes(age, weekly_wages)) +
+  geom_point(color = "seagreen3") +
+  geom_line(aes(y = model_pred), color = "plum") +
+  ylab("Weekly Wages") +
+  xlab("Age") +
+  ggtitle("Growth of Weekly Wages in Relation to Player Age in La Liga")
+```
+
+
+
+## Conclusions
+
+According to the results of the regression model, Hypothesis 1 positing that age had a significant positive relationship with weekly wages was supported. For every unit increase of age, across all top 5most valuable teams, wages increased by around £7,791. With lower and upper bounds of £4,765 and £10,818, respectively, with a 95% confidence interval, this relationship can be deemed significant. It would not be surprising if the mean were around £4,765 or around £10,818, but either way the relationship between weekly wages and age would still be positive.
+Furthermore, the latter part of Hypothesis 1, that the singificant relationship between age and weekly wages would remain constant in only the EPL sample of players, was also supported with a slope of around £4,241.6. Ninety-five percent confidence interval bounds were both positive at £204.2 and £8,279, indicating statistical significance. Therefore, as player age increases in the two EPL teams, so too would the players' wages, by around £4,241.6 with every increase in unit of age.
+
+Hypothesis 2 was only partially supported. The La Liga teams displayed a significant positive relationship between weekly wages and age in regards to their young players (age range of 18-24). The mean weekly wages for young players was around £58,700, with positive 95% confidence interval bounds, singifying a statistically significant positive relationship with young player age. The EPL's mean was around £4,006 and the Bundesliga's was around -£8,700, but neither league's difference from that of La Liga's was statistically significant. This implies that the top 5 teams, grouped by their league, do not differ significantly from each other in how much they pay their young players per week.
+
+As shown from the regression model results, Hypothesis 3 was only partially supported. For this hypothesis, I was just observing if the weekly wage growth for the Bundesliga players was less than the other 2 leagues in regards to increasing with age. The Bundesliga's slope was around £5,049 (significant positive relationship, indicating weekly wage growth of around £5,049 for every year in age gained by each player), which was indeed less than La Liga's growth of around £16,023, but the EPL displayed less slope growth than the Bundesliga with a slope of around £4,241.6. 
+It is important to note that La Liga has a few outlying players in their 2017/18 wage table. Cristiano Ronaldo's weekly wages are £365,000 and Gareth Bale's are £350,000, and Lionel Messi's weekly wages are £500,000, all of which probably skew La Liga's mean upwards. Furthermore, Arsenal have two players who's weekly wages are £2,000 and £4,000, both of which could be outliers that drag down the EPL's mean. 
+
+These results cannot be generalized to the entirety of the EPL, La Liga, or the Bundesliga, seeing as there were only 2 teams used from the EPL and La Liga and only 1 team used from the Bundesliga. However, it is nonetheless interesting to compare the spending of each of the clubs on their players. 
+
+
+
+## References
+https://www.totalsportek.com/money/real-madrid-player-salaries/
+http://www.spotrac.com/epl/manchester-united-f.c/payroll/
+https://www.totalsportek.com/money/barcelona-player-salaries/
+http://tsmsportz.com/football/bayern-munich-players-salaries/
+http://www.spotrac.com/epl/arsenal-f.c/payroll/
+https://www.si.com/planet-futbol/photo/2017/03/31/most-valuable-soccer-clubs-top-10-real-madrid-manchester-united-barcelona
+http://www.dw.com/en/the-top-10-most-expensive-football-transfers/g-41958100
+https://en.wikipedia.org/wiki/List_of_European_Cup_and_UEFA_Champions_League_finals#By_club
+
+
