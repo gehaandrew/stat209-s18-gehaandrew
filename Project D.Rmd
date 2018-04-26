@@ -1,0 +1,281 @@
+---
+title: "Analyzing the Green Bay Packers' Pass Play Rates & Yards Gained per Play"
+author: "Andrew Geha"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(ggmap)
+library(viridis)
+library(forcats)
+library(smodels)
+library(ggrepel)
+```
+
+
+##Overview
+
+Whether it was Brett Favre or Aaron Rodgers at the helm of the Green Bay Packers' offence, the team has been known to be predominantly pass-play-heavy. Some analysts criticize the Packers for being too one-dimensional on offence, saying that they rely too much on Aaron Rodgers' arm to get them through their games and seasons. 
+
+I decided to take a closer look at the rate at which the Packers choose passing plays, first looking broadly at the pass rate across all the teams they played in 2015. Then, I took into account the passing rates from each individual quarter played against each team to see if the rate would dramatically change or not. 
+From there I looked specifically at the passing rates--continuing to take quarterly numbers into account--specific to the games in which the Packers played their NFC North rivals (the Chicago Bears, the Detroit Lions, and the Minnesota Vikings.)
+
+I also looked at the average number of yards gained per play by the Packers, across all their games in 2015, still taking into account the means for each quarter. I did this to get a sense of how the yards gained per play related to the Packers' tendency to pass the ball.
+
+Both the passing rates and the average yards gained per play were observed relative to the score difference between the team on defense and the Packers in the games, both as a whole and also as broken into the individual quarters of the games.
+
+From the data, I concluded that for every 5 plays on average, the Packers pass the ball 50% of the time, although the pass rate is lower when the score difference is in the Packers' favor and higher when the score difference favors the defensive team. Furthermore, when the Packers play their NFC North rivals, their pass rate remains lower when the score is in their favor and higher when the defensive team is winning.
+The average number of yards gained per play by the Packers is higher when the score is in their favor and lower when the defensive team is in the lead. 
+
+
+
+##Data Dictionary
+
+Here is the data dictionary for the nfl dataset:
+
+*offense_team*: name of the offensive team on the play
+*defense_team*: name of the defensive team on the play
+*yards_gained*: yards gained on the play
+*yards_net*: net yards on the drive
+*yards_to_go*: yards to go for the first down (start of play)
+*quarter*: quarter of the game
+*down*: down number at the start of the play
+*first_down*: was the result a first down?
+*interception*: was the result an interception
+*fumble*: was the result a fumble
+*pass*: did the team attempt a pass on the play?
+*pass_complete*: was the pass complete
+*poss_team_score*: current score of the offensive team (start of play)
+*def_team_score*: current score of the defensive team (start of play)
+*yards_to_touchdown*: yards to a touchdown (start of play)
+*drive*: drive number
+*pass_location*: location of the field that the pass went to
+*run_location*: location of the field that the rushed attempted to run
+*passer*: name of the passer
+*rusher*: name of the rusher
+*receiver*: name of the receiver
+
+
+
+```{r}
+nfl <- read_csv("https://statsmaths.github.io/stat_data/nfl2015.csv")
+```
+
+
+##Analysis
+
+I filtered out the Packers (as the team on offense) from the larger NFL dataset. I proceeded to summarize from the new "packers" a new dataset in which each defensive team was the unit of observation along with the Packers' offense descriptive statistics from each of those games, such as the average number of yards gained and the average number of times a passing play was chosen.
+
+```{r, include=FALSE}
+packers <- filter(nfl, offense_team == "GB")
+packers
+```
+
+
+```{r, echo=FALSE}
+defense_teams <- group_summarize(packers, defense_team)
+```
+
+I created a new "pass_rate" variable, which considered the rate at which the Packers chose a passing play for every 5 plays run by their offense. I also made a variable to display the score difference between the Packers and the defensive team, using the defensive team's score as my baseline and subtracting the Packers' score from it. This was done to gain a more situational view of when the Packers' chose to pass the ball.
+
+```{r, echo=FALSE}
+
+defense_teams$pass_rate <- defense_teams$pass_sum / defense_teams$n * 5
+
+```
+
+```{r, echo=FALSE}
+
+defense_teams$score_difference <- defense_teams$def_team_score_mean - defense_teams$poss_team_score_mean
+
+```
+
+
+As shown with the scatterplot below, when the score is in the Packers' favor, for every 5 snaps run by the Packers' offense they choose a passing play around 2.5 times. As depicted by the trendline, though, the passing rate is higher in the games in which the Packers' were down. In a couple of games highlighted toward the top of the graph, the Packers' passing rate is closer to 4 out of every 5 plays, when down by around a touchdown or more.
+
+```{r, echo=FALSE}
+
+ggplot(defense_teams, aes(score_difference, pass_rate)) +
+  geom_point(color = "lightcoral") +
+  geom_smooth(method = "lm", se = FALSE, color = "seagreen3", linetype = "dashed", size = 0.8) +
+  annotate("rect", xmin = 5.5, xmax = 13, ymin = 3.42, ymax = 3.6, fill = "orchid1", alpha = 0.1) +
+  xlab("Score Difference") +
+  ylab("Passing Rate") +
+  ggtitle("Packers' Passing Rate per 5 Snaps Relative to Score Difference")
+
+```
+
+
+The following two graphs display the passing rate compared to the Packers' own median score across the teams they played against as well as the passing rate in regards to the median defensive team's score. The Packers' passing rate is higher when the defensive team has a higher number of points compared to when the Packers themselves have a higher number of points. Although in both graphs the passing rate is lower when either the offense or defense team has a lower amount of points, and higher when the number of points is higher, this difference is more noticeable when the defensive team's score is increasingly greater than 0 than when the Packers put points on the board.
+
+```{r, echo=FALSE}
+
+ggplot(defense_teams, aes(def_team_score_median, pass_rate)) +
+  geom_point(color = "darkorchid1") +
+  geom_smooth(method = "lm", se = FALSE, color = "deepskyblue", linetype = "dashed", size = 0.8) +
+  xlab("Median Defense Team Score") +
+  ylab("Passing Rate") +
+  ggtitle("Packers' Passing Rate per 5 Snaps Relative to Defense Team Score")
+
+```
+
+
+```{r, echo=FALSE}
+
+ggplot(defense_teams, aes(poss_team_score_median, pass_rate)) +
+  geom_point(color = "cyan3") +
+  geom_smooth(method = "lm", se = FALSE, color = "deeppink", linetype = "dashed", size = 0.8) +
+  xlab("Median Packers' Score") +
+  ylab("Passing Rate") +
+  ggtitle("Packers' Passing Rate per 5 Snaps Relative to Own Score")
+
+```
+
+
+I created another dataset summarizing the "packers" dataset with each quarter played against each time as the unit of observation. I created variables for the passing rate and the score difference using the same method as done earlier. 
+
+```{r, echo=FALSE}
+packers_quarter <- group_summarize(packers, quarter, defense_team)
+```
+
+```{r, echo=FALSE}
+
+packers_quarter$pass_rate_quarter <- packers_quarter$pass_sum / packers_quarter$n * 5
+
+packers_quarter$score_difference_quarter <- packers_quarter$def_team_score_mean - packers_quarter$poss_team_score_mean
+
+```
+
+
+
+When taking individual quarters played against each defensive team, the difference between the passing rate when the Packers are ahead compared to when the defense team is ahead is not substantial. As highlighted on the scatterplot, in the majority of the quarters played, the Packers were either tied, trailing by a field goal (3 points), or winning. In all of these cases, their passing rate was largely between 2 and 3 plays for every 5 snaps run. Their passing rate was slightly higher when the defensive team's score was larger than their own score, but not by much.
+
+
+```{r, echo=FALSE}
+
+ggplot(packers_quarter, aes(score_difference_quarter, pass_rate_quarter)) +
+  geom_point(aes(color = factor(quarter))) +
+  geom_smooth(method = "lm", se = FALSE, color = "darkblue", linetype = "dashed", size = 0.5) +
+  annotate("rect", xmin = -9, xmax = 4, ymin = 1.8, ymax = 3.5, alpha = 0.1, fill = "lawngreen") +
+  xlab("Score Difference within Each Quarter Played") +
+  ylab("Passing Rate") +
+  ggtitle("Packers' Passing Rate per 5 Snaps Relative to Score Difference per Quarter")
+  
+
+```
+
+
+
+
+```{r, echo=FALSE}
+
+defense_and_quarter <- group_summarize(packers, defense_team, quarter)
+
+```
+
+
+I proceeded to make a dataset summarizing the data with the Packers' NFC North rivals as the unit of observation with each quarter played against them. The Packers played each team twice, but each quarter's data was compiled together (for example, the first quarter in each game played against the Bears was compiled into one first quarter observation).
+
+
+```{r, include=FALSE}
+
+rivals <- filter(defense_and_quarter, defense_team %in% c("CHI", "MIN", "DET"))
+rivals
+
+```
+
+
+```{r, echo=FALSE}
+
+rivals$pass_rate_nfc <- rivals$pass_sum / rivals$n * 5
+
+rivals$score_difference_nfc <- rivals$def_team_score_mean - rivals$poss_team_score_mean
+
+```
+
+
+As shown below, the Packers on average chose closer to 3 out of every 5 plays to be a passing play against their rivals, considering the data from each quarter played against them. Consistent with the prior data discussed, the passing rate is lower when the Packers are either winning or close to tied, and higher when the score difference is higher in the defensive team's favor. I labeled a noticeable outlier (Detroit), which might be skewing the trendline to be more positively sloped than it otherwise might be. In both of the 4th quarters played against them, the Packers chose close to 5 out of every 5 plays to be passing plays; these cases were when Detroit was leading.
+
+```{r, echo=FALSE}
+
+ggplot(rivals, aes(score_difference_nfc, pass_rate_nfc)) +
+  geom_point(aes(color = factor(quarter))) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", size = 0.6) +
+  annotate("text", x = 7.5, y = 4.4, label = "DET", size = 4) +
+  xlab("Score Difference per Quarter") +
+  ylab("Passing Rate") +
+  ggtitle("Packers' Passing Rate per 5 Snaps Relative to Score Difference against Rivals")
+
+```
+
+
+I reverted back to the "packers" dataset, although summarizing the data based on each quarter played against each team again. The Packers' average number of yards gained per play is actually higher when the Packers are leading and lower then the score difference is in the defensive team's favor. However, most of the data points are located when either the Packers were only down by a few points, tied, or were winning. It's likely in these cases that they would be still trying to gain a fair number of yards per play (between 5 and 7.5). However, when the score is dramatically in the defensive team's favor, perhaps the Packers--especially in later stages of the game--would be more inclined to run out the clock and prepare for the next game instead of unnecessarily risking player injuries.
+
+
+```{r, echo=FALSE}
+
+ggplot(packers_quarter, aes(score_difference_quarter, yards_gained_mean)) +
+  geom_point(aes(color = factor(quarter))) +
+  geom_smooth(method = "lm", se = FALSE, color = "magenta4", linetype = "dashed", size = 0.5) +
+  annotate("rect", xmin = -7, xmax = 4, ymin = 3.5, ymax = 7.4, fill = "turquoise1", alpha = 0.1) +
+  xlab("Score Difference per Quarter") +
+  ylab("Average Yards Gained") +
+  ggtitle("Packers' Average Yards Gained per Play Relative to Score Difference")
+
+```
+
+
+
+```{r, echo=FALSE}
+defense_teams$score_difference_def <- defense_teams$def_team_score_mean - defense_teams$poss_team_score_mean
+```
+
+
+In regards to the average number of yards gained per play by the Packers against each team, regardless of individual quarters as a factor, the average number of yards is still greater when the Packers are ahead than when they are losing. 
+
+```{r, echo=FALSE}
+
+ggplot(defense_teams, aes(score_difference_def, yards_gained_mean)) +
+  geom_point(color = "royalblue1") +
+  geom_smooth(method = "lm", se = FALSE, color = "salmon", linetype = "dashed", size = 0.5) +
+  xlab("Score Difference") +
+  ylab("Average Yards Gained") +
+  ggtitle("Packers' Average Yards Gained per Play Relative to Score Difference")
+
+```
+
+
+##Conclusion
+
+Overall, the assertion that the Packers are a pass-heavy offense appears to be true. The Packers choose passing plays at a constant rate between 2 and 3 plays for every 5 snaps run, but this rate is higher when they are trailing in games than when they are ahead. This might appear to be common sense, but it is possible for teams to have star running backs that can get the job done more effectively than their quarterbacks. The Packers also pass the ball at a steady rate when playing their rivals, especially when they are trailing in those games as well.
+Furthermore, the Packers gain more yards on average when they are in the lead or tied. That average is lower when they are trailing in games.
+
+##References
+
+https://www.teamrankings.com/nfl/stat/plays-per-game
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
